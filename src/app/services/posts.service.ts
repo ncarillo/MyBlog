@@ -22,6 +22,10 @@ export class PostsService {
     firebase.database().ref('/posts').set(this.posts);
   }
 
+  saveSinglePost(id: number, post: Post){
+    firebase.database().ref('/posts/'+id).update({ loveIts: post.loveIts}); 
+  }
+
   getPosts(){
     firebase.database().ref('/posts')
     .on('value',(data: firebase.database.DataSnapshot) => {
@@ -51,6 +55,18 @@ export class PostsService {
   }
 
   removePost(post: Post) {
+    if(post.image) {
+      const storageRef = firebase.storage().refFromURL(post.image);
+      storageRef.delete().then(
+        () => {
+          console.log('Image supprimé!');
+        },
+        (error) => {
+          console.log('Image impossible à supprimer! : ' + error);
+        }
+      );
+    }
+    
     const postIndexToRemove = this.posts.findIndex(
       (postEl) => {
         if(postEl === post) {
@@ -61,5 +77,29 @@ export class PostsService {
     this.posts.splice(postIndexToRemove, 1);
     this.savePosts();
     this.emitPosts();
+  }
+
+  uploadFile(file: File) {
+    return new Promise(
+      (resolve, reject) => {
+        const almostUniqueFileName = Date.now().toString();
+        const upload = firebase.storage().ref()
+          .child('images/' + almostUniqueFileName + file.name)
+          .put(file);
+        upload.on(firebase.storage.TaskEvent.STATE_CHANGED,
+          () => {
+            console.log('Chargement…');
+          },
+          (error) => {
+            console.log('Erreur de chargement ! : ' + error);
+            reject();
+          },
+          () => {
+            console.log('Chargé…');
+            resolve(upload.snapshot.ref.getDownloadURL());
+          }
+        );
+      }
+    );
   }
 }

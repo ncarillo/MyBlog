@@ -1,8 +1,11 @@
 <div class="row">
   <div class="col-xs-12">
-    <h2>Vos posts</h2>
+    <h1 class="text-center">Vos Posts</h1>
+    <button class="btn btn-primary" aria-hidden="true" (click)="onNewPost()">+ Ajouter</button>
     <div class="list-group">
       <button
+      [ngClass]="{'btn-green':post.loveIts > 0,
+                  'btn-red':post.loveIts < 0}"
         class="list-group-item"
         *ngFor="let post of posts; let i = index"
         (click)="onViewPost(i)">
@@ -12,9 +15,16 @@
             <span class="glyphicon glyphicon-minus"></span>
           </button>
         </h3>
-        <p class="list-group-item-text">{{ post.text }}</p>
-      </button>
-    </div>
-    <button class="btn btn-primary" (click)="onNewPost()">Nouveau post</button>
+        <p class="text-right">
+          <em>Créé le : {{ post.created_at | date: 'short' }}</em>
+        </p>
+        <img style="max-width:400px;" class="img-rounded img-responsive center-block" *ngIf="post.image" [src]="post.image">
+        <p class="list-group-item-text">{{ post.content }}</p>
+        <br>
+        <span class="badge">{{ post.loveIts }}</span>
+        <button class="btn btn-success" (click)="onLikeIt(i, post)">I like it</button>
+        <button class="btn btn-danger" (click)="onDisLikeIt(i, post)">I Don't like it</button>
+       </button>
+      </div>
   </div>
 </div>

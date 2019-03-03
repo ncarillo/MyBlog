@@ -1,10 +1,12 @@
 export class Post {
     
-    private image: string;
-    private nbLike: number;
-    private nbUnLike: number;
+    public image: string;
+    public loveIts: number;
+    public created_at: number;
     
-    constructor(public title: string, public text: string) {
-        
+    constructor(public title: string, public content: string) {
+        this.created_at = new Date().getTime();
+        this.loveIts = 0;
     }
 }
+

@@ -40,4 +40,14 @@ export class PostListComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.postsSubscription.unsubscribe();
   }
+
+  onLikeIt(id: number, post: Post){
+    post.loveIts++;
+    this.postsService.saveSinglePost(id, post);
+  }
+
+  onDisLikeIt(id: number, post: Post){
+    post.loveIts--;
+    this.postsService.saveSinglePost(id, post);
+  }
 }

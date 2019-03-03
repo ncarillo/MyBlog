@@ -12,6 +12,9 @@ import { Post } from '../../../models/post.model';
 export class PostFormComponent implements OnInit {
 
   postForm: FormGroup;
+  fileIsUploading = false;
+  fileUrl: string;
+  fileUploaded = false;
 
   constructor(private formBuilder: FormBuilder, private postsService: PostsService,
               private router: Router) { }
@@ -23,15 +26,37 @@ export class PostFormComponent implements OnInit {
   initForm() {
     this.postForm = this.formBuilder.group({
       title: ['', Validators.required],
-      text: ['', Validators.required]
+      content: ['', Validators.required]
     });
   }
   
   onSavePost() {
     const title = this.postForm.get('title').value;
-    const text = this.postForm.get('text').value;
-    const newPost = new Post(title, text);
+    const content = this.postForm.get('content').value;
+    const newPost = new Post(title, content);
+    if(this.fileUrl && this.fileUrl !== '') {
+      newPost.image = this.fileUrl;
+    }
     this.postsService.createNewPost(newPost);
+    this.router.navigate(['/posts']);
+  }
+
+  onUploadFile(file: File) {
+    this.fileIsUploading = true;
+    this.postsService.uploadFile(file).then(
+      (url: string) => {
+        this.fileUrl = url;
+        this.fileIsUploading = false;
+        this.fileUploaded = true;
+      }
+    );
+  }
+
+  detectFiles(event) {
+    this.onUploadFile(event.target.files[0]);
+  }
+
+  onBack() {
     this.router.navigate(['/posts']);
   }
 }
